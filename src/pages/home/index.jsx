@@ -1,71 +1,93 @@
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import JobList from "../../components/JobList";
-
 const Home = () => {
+
+    
     const dispatch = useDispatch();
 
-    const [value, setValue] = useState("");
+    const [state, setState] = useState({
+        value: '',
+        state: '',
+        valueSearch: '',
+        disabledBtnAdd: '',
+    })
+    const {value,valueSearch,disabledBtnAdd} = state;
 
+
+
+    
     let selJob = useSelector((state)=>  state.selectedJob);
 
-
-   
-
-    useEffect(()=>{
-        
+    useEffect(()=>{  
         if(selJob){
-            setValue(selJob);
+            setState({
+                ...state,
+                value : selJob,
+                disabledBtnAdd :'',
+            });
         }
-       
-        // selJob && setValue()
     }, [selJob])
 
 
     
     const handleChange = (e) => {
         e.preventDefault();
-        setValue(e.target.value)
+        setState({
+            ...state,
+            value : e.target.value,
+        });
     }
-
-    const addTodo = () => {
-            dispatch({
-                type: 'CREATE',
-                payload: value,
-            })
-            setValue("");
-
-          
-    }
-
-    const editToDo = (e) => {
+    const handleChangeSearch = (e) => {
         e.preventDefault();
-        setValue(e.target.value)
-        dispatch({
-            type: 'UPDATE',
-            // payload: value,
-            payload: [{
-                value,
-                selJob,
-            }]
-        })
-        console.log(value);
-        console.log(selJob);
+        const keyword = document.getElementById("txtSearch").value.trim().toLowerCase();
 
+        setState({
+            ...state,
+            state : e.target.value,
+            valueSearch : keyword,
+        });
         
+        dispatch({
+            type: 'SEARCH',
+        })
+    }
+
+    const addTodo = (value) => {
+            return(e) => {
+                dispatch({
+                    type: 'CREATE',
+                    payload: value,
+                })
+                setState({
+                    ...state,
+                    value : '',
+                });
+            }  
     }
 
 
-    
-
-    
-    // // console.log(selJob, 'dads')
-    // useEffect(()=> {
+    const editToDo = (value, selJob) => {
+        return(e) => {
+            e.preventDefault();
+            
+            setState({
+                ...state,
+                value : e.target.value,
+                disabledBtnAdd :'asd',
+            });
            
-    //     })
-    // }, [jobArr]);
+            dispatch({
+                type: 'UPDATE',
+                payload: [{
+                    value,
+                    selJob,
+                }]
+            })
+        }
+    }
 
+    
     return(
         <div className="container">
             <h1 className="text-center mt-4">Todolist</h1>
@@ -76,10 +98,33 @@ const Home = () => {
                 <div>
                     <input  onChange={handleChange} type="text" value ={value} />
                     <br/>
-                    {selJob ? <button className="mt-1 mb-5" onClick={editToDo} > Edit</button> :  <button className="mt-1 mb-5" onClick = {addTodo}> Add</button> }
+                  
+                    {selJob
+                    ? 
+                    <div>
+                            
+                            { disabledBtnAdd
+                            
+                            ?
+                                <button  className="mt-1 mb-5 mr-4" onClick = {addTodo(value)}> Add</button> 
+                            :
+
+                            <button disabled className="mt-1 mb-5 mr-4" onClick = {addTodo(value)}> Add</button> 
+                            }
+                            <button className="mt-1 mb-5" onClick={editToDo(value, selJob)} > Edit</button>
+
+                    </div>
+                    : 
+                     <button  className="mt-1 mb-5"  onClick = {addTodo(value)}> Add</button> 
+
+                    }
+                     <br/>                   
+                    <p>Tim Kiem</p>
+                     <input  onChange={handleChangeSearch} id="txtSearch" type="text" state ={state.state} />
+
 
                 </div>
-                <JobList />
+                <JobList valueSearch={valueSearch} editToDo={editToDo} />
             </div>
         </div>
     );

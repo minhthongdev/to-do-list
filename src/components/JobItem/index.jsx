@@ -1,43 +1,13 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
 
 
 const JobItem = (props) => {
 
-    const {name} = props.item;
-    const dispatch = useDispatch();
+  
+    const {editToDo, handleDelete, item} = props;
+    const {name, id} = item;
 
-    const [value, setValue] = useState("");
-
-    const todo = useSelector((state)=>  state.jobList);
-
-
-    const handleDelete = () => {
-        dispatch({
-            type: "DELETE",
-            payload: name,
-        })
-    }
-
-
-    const handleEdit = () => {
-        dispatch({
-            type: 'SELECT',
-            payload: name,
-        })
-    }
-
-    const editToDo = () => {
-        const newToDo = prompt('Let\'s make something changes');
-        value.filter(todo => {
-            if(todo.name === name + 1){
-                todo.name = newToDo;
-            }
-            return todo;
-        })
-        setValue({todo});
-
-    }
+   
 
 
     return(
@@ -45,16 +15,15 @@ const JobItem = (props) => {
         <td>{name}</td>
         
         <td>
-          <button onClick={handleEdit}  className="btn btn-info mr-2">
+          <button onClick={editToDo(id)}  className="btn btn-info mr-2">
             Edit
           </button>
-          <button  onClick={handleDelete} className="btn btn-danger">
+          <button  onClick={handleDelete(id)} className="btn btn-danger">
             Delete
           </button>
         </td>
       </tr>
     )
-
 }
 
 export default JobItem;
